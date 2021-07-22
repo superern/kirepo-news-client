@@ -1,5 +1,5 @@
 <template>
-  <div class="column">
+  <div class="column" v-if="is_published">
     <div class="card">
       <header class="card-header">
         <p class="card-header-title has-text-grey">
@@ -8,11 +8,7 @@
       </header>
       <div class="card-content">
         <div class="content has-text-centered">
-          <b-icon
-            :icon="icon"
-            size="is-large"
-            type="is-primary"
-          />
+          <p>{{ content }}</p>
         </div>
       </div>
       <footer class="card-footer">
@@ -31,12 +27,15 @@ export default {
   props: {
     title: {
       type: String,
-      required: true
+      required: true,
     },
-    icon: {
+    content: {
       type: String,
-      required: true
-    }
-  }
+      required: true,
+    },
+    is_published: {
+      type: Boolean,
+    },
+  },
 }
 </script>
