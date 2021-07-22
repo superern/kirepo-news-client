@@ -1,6 +1,20 @@
 <template>
   <section class="m-5">
-    <b-field>
+    <div class="my-5" style="display: flex; justify-content: space-between">
+      <b-button
+        class="trashes-button"
+        icon="magnify"
+        :type="isTrashMode ? 'is-danger' : 'is-info'"
+        size="is-small"
+        @click="toggleTrashMode"
+      >
+        <span class="icon is-left"
+          ><i
+            class="mdi mdi-18px"
+            :class="[{ 'mdi-trash-can': isTrashMode }, 'mdi-newspaper']"
+          ></i
+        ></span>
+      </b-button>
       <b-button
         class="add-button"
         label="Create Article"
@@ -8,7 +22,7 @@
         size="is-small"
         @click="isAddModalActive = true"
       />
-    </b-field>
+    </div>
     <b-field name="Search">
       <b-input
         style="flex: 1"
@@ -68,12 +82,11 @@
         centered
         v-slot="props"
       >
-        <span class="tag is-success">
-          {{
-            props.row.published_at
-              ? $moment(props.row.published_at).fromNow()
-              : 'Not yet published'
-          }}
+        <span class="tag is-success" v-if="props.row.is_published">
+          {{ $moment(props.row.published_at).fromNow() }}
+        </span>
+        <span class="tag is-danger" v-if="!props.row.is_published">
+          Not yet published
         </span>
       </b-table-column>
 
@@ -118,14 +131,35 @@
                 {{ props.row.content }}
               </p>
 
-              <!-- Update Modal Button -->
-              <b-button
-                class="update-button"
-                label="Update"
-                type="is-primary"
-                size="is-small"
-                @click="showUpdateModal(props.row)"
-              />
+              <div v-if="!isTrashMode">
+                <!-- Update Modal Button -->
+                <b-button
+                  class="update-button"
+                  label="Update"
+                  type="is-primary"
+                  size="is-small"
+                  @click="showUpdateModal(props.row)"
+                />
+
+                <!-- Delete Modal Button -->
+                <b-button
+                  class="delete-button"
+                  label="Delete"
+                  type="is-danger"
+                  size="is-small"
+                  @click="onDeleteArticle(props.row.id)"
+                />
+              </div>
+              <div v-else>
+                <!-- Restore Modal Button -->
+                <b-button
+                  class="restore"
+                  label="Restore"
+                  type="is-info"
+                  size="is-small"
+                  @click="onRestoreArticle(props.row.id)"
+                />
+              </div>
             </div>
           </div>
         </article>
@@ -186,6 +220,9 @@ export default {
     ModalForm,
   },
   computed: {
+    url() {
+      return this.isTrashMode ? '/news/trashes' : '/news'
+    },
     transitionName() {
       if (this.useTransition) {
         return 'fade'
@@ -220,13 +257,14 @@ export default {
         content: '',
         is_published: false,
       },
+      isTrashMode: false,
     }
   },
   methods: {
     loadAsyncData() {
       this.loading = true
       this.$axios
-        .get(`/news?${this.filter}`)
+        .get(`${this.url}?${this.filter}`)
         .then(({ data }) => {
           this.meta.per_page = data.meta.per_page
 
@@ -335,10 +373,79 @@ export default {
       props.close()
       this.form = {}
     },
+    onDeleteArticle(id) {
+      const vm = this
+      this.$buefy.dialog.confirm({
+        type: 'is-danger',
+        title: 'Careful!',
+        message: 'Do you want to delete this article?',
+        confirmText: 'Yes, I want to delete it',
+        cancelText: 'No, not yet',
+        onConfirm: () => {
+          vm.$axios
+            .$delete(`/news/${id}`)
+            .then(({ message }) => {
+              vm.$buefy.dialog.alert({
+                title: 'Success',
+                message: message,
+                type: 'is-success',
+              })
+            })
+            .catch(({ response }) => {
+              vm.$buefy.dialog.alert({
+                title: 'Failed',
+                message: response.message,
+                type: 'is-danger',
+              })
+            })
+            .finally(() => {
+              this.filter = `${this.sortFilter}`
+              this.loadAsyncData()
+            })
+        },
+      })
+    },
+    onRestoreArticle(id) {
+      const vm = this
+      this.$buefy.dialog.confirm({
+        type: 'is-info',
+        title: 'Check',
+        message: 'Do you want to restore this article?',
+        confirmText: 'Yes, I want to restore it',
+        cancelText: 'No, not yet',
+        onConfirm: () => {
+          vm.$axios
+            .$post(`/news/${id}`)
+            .then(({ message }) => {
+              vm.$buefy.dialog.alert({
+                title: 'Success',
+                message: message,
+                type: 'is-success',
+              })
+            })
+            .catch(({ response }) => {
+              vm.$buefy.dialog.alert({
+                title: 'Failed',
+                message: response.message,
+                type: 'is-danger',
+              })
+            })
+            .finally(() => {
+              this.filter = `${this.sortFilter}`
+              this.loadAsyncData()
+            })
+        },
+      })
+    },
+    toggleTrashMode() {
+      this.isTrashMode = !this.isTrashMode
+      this.loadAsyncData()
+    },
   },
   mounted() {
     this.filter = this.sortFilter
     this.loadAsyncData()
+    const vm = this
   },
   watch: {
     query: {
