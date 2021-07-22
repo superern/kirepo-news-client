@@ -1,8 +1,29 @@
-# kirepo-news-client
+<p align="center"><a href="https://kirepu.lu" target="_blank"><img src="https://kirepo.lu/img/kirepo-white-bg.f3cde4ea.svg" width="400"></a></p>
+
+<p align="center">
+<a href="https://www.huawei.com"><img src="https://kirepo.lu/img/huawei.fc950ca9.png" alt="Huawei" width="45" style="background: white"></a>
+<a href="https://servipay.eu"><img src="https://kirepo.lu/img/servipay.1871e891.png" alt="ServiPay" width="50"></a>
+<a href="https://worldline.com"><img src="https://kirepo.lu/img/worldline.3e4b6f40.jpg" alt="Worldline" width="50"></a>
+<a href="https://www.lg.com"><img src="https://kirepo.lu/img/lg.efefe1a6.jpg" alt="LG" width="50"></a>
+<a href="https://www.luxinnovation.lu"><img src="https://kirepo.lu/img/fit-4-digital.6a1ea578.png" alt="FIT4 Digital" width="50" style="background: white"></a>
+</p>
+
+## KIREPO NEWS CLIENT
+
+## Requirements
+
+In order to run this project locally, you need the following:
+
+- node
+- yarn
+
 
 ## Build Setup
 
 ```bash
+# create .env file
+- `cp .env-example .env`
+
 # install dependencies
 $ yarn install
 
@@ -67,3 +88,11 @@ More information about the usage of this directory in [the documentation](https:
 This directory contains your Vuex store files. Creating a file in this directory automatically activates Vuex.
 
 More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/store).
+
+## Contributing
+
+Thank you **superern** for considering contributing to the Kirepo News Client.
+
+## License
+
+The Kirepo News API is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
