@@ -4,9 +4,8 @@
       <b-input
         v-model="query"
         placeholder="Search..."
-        icon="search"
-        size="is-small"
-        v-debounce:300ms="onSearch"
+        icon="magnify"
+        size="is-medium"
       />
     </b-field>
 
@@ -18,6 +17,7 @@
       backend-pagination
       :total="meta.total"
       :per-page="meta.per_page"
+      :current-page="meta.current_page"
       @page-change="onPageChange"
       aria-next-label="Next page"
       aria-previous-label="Previous page"
@@ -116,6 +116,8 @@
 </template>
 
 <script>
+import { debounce } from 'vue-debounce'
+
 export default {
   name: 'news',
   computed: {
@@ -123,6 +125,9 @@ export default {
       if (this.useTransition) {
         return 'fade'
       }
+    },
+    sortFilter() {
+      return `sort=${this.sortField},${this.sortOrder}`
     },
   },
   data() {
@@ -136,21 +141,28 @@ export default {
       sortOrder: 'desc',
       defaultSortOrder: 'desc',
       filterLimit: 20,
-      meta: [],
+      meta: {
+        per_page: 5,
+        current_page: 1,
+        total: 0,
+      },
       query: '',
+      filter: '',
     }
   },
   methods: {
-    loadAsyncData(url) {
+    loadAsyncData() {
       this.loading = true
       this.$axios
-        .get(url)
+        .get(`/news?${this.filter}`)
         .then(({ data }) => {
-          this.meta = data.meta
+          this.meta.per_page = data.meta.per_page
+
           let currentTotal = data.meta.total
-          if (data.meta.total / this.perPage > this.filterLimit) {
-            currentTotal = this.perPage * this.filterLimit
+          if (data.meta.total / data.meta.per_page > this.filterLimit) {
+            currentTotal = data.meta.per_page * this.filterLimit
           }
+
           this.meta.total = currentTotal
           this.data = data.data
           this.loading = false
@@ -163,23 +175,51 @@ export default {
         })
     },
     onPageChange(page) {
-      this.meta.page = page
-      this.loadAsyncData(
-        `/news?page=${page}&sort=${this.sortField}, ${this.sortOrder}`
-      )
+      let currentPage = `&page=${page}`,
+        pageQuery = `&page=${this.meta.current_page}`
+
+      this.filter =
+        this.filter.search(pageQuery) === -1
+          ? this.filter + currentPage
+          : this.filter.replace(pageQuery, currentPage)
+
+      console.log(this.filter)
+      this.meta.current_page = page
+
+      this.loadAsyncData()
     },
     onSort(field, order) {
-      this.loadAsyncData(`/news?page=${this.meta.page}&sort=${field},${order}`)
+      console.log('sorting')
+      let currentQuery = `sort=${field},${order}`
+
+      this.filter = this.filter.replace(this.sortFilter, currentQuery)
+      this.sortField = field
+      this.sortOrder = order
+
+      this.loadAsyncData()
     },
-    onSearch(query) {
-      this.$buefy.toast.open(`Searching data with key word ${query}`)
-      this.loadAsyncData(
-        `/news?like[0]=title,${query}&like[1]=content,${query}`
-      )
-    },
+    onSearch: debounce((vm, query) => {
+      if (!query) {
+        // user clear the filters
+        vm.filter = vm.sortFilter
+        vm.meta.current_page = 1
+      } else {
+        vm.$buefy.toast.open(`Searching data with key word ${query}`)
+        vm.filter += `&like[0]=title,${query}&like[1]=content,${query}`
+      }
+      vm.loadAsyncData()
+    }, 300),
   },
   mounted() {
-    this.loadAsyncData(`/news?sort=${this.sortField}, ${this.sortOrder}`)
+    this.filter = this.sortFilter
+    this.loadAsyncData()
+  },
+  watch: {
+    query: {
+      handler(newValue, oldValue) {
+        this.onSearch(this, newValue)
+      },
+    },
   },
 }
 </script>
