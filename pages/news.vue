@@ -153,14 +153,16 @@ export default {
     },
     onPageChange(page) {
       this.meta.page = page
-      this.loadAsyncData(`/news?page=${page}&sort=updated_at,desc`)
+      this.loadAsyncData(
+        `/news?page=${page}&sort=${this.sortField}, ${this.sortOrder}`
+      )
     },
     onSort(field, order) {
       this.loadAsyncData(`/news?page=${this.meta.page}&sort=${field},${order}`)
     },
   },
   mounted() {
-    this.loadAsyncData('/news?sort=updated_at,desc')
+    this.loadAsyncData(`/news?sort=${this.sortField}, ${this.sortOrder}`)
   },
 }
 </script>
