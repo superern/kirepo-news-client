@@ -1,6 +1,6 @@
 <template>
   <form action="">
-    <div class="modal-card" style="width: auto">
+    <div class="modal-card" style="width: auto; height: 100vh">
       <header class="modal-card-head">
         <p class="modal-card-title">Article</p>
         <button type="button" class="delete" @click="$emit('close')" />
@@ -15,17 +15,9 @@
           >
           </b-input>
         </b-field>
-
-        <b-field label="Content">
-          <b-input
-            maxlength="200"
-            type="textarea"
-            v-model="form.content"
-            password-reveal
-            placeholder="Your Content"
-          >
-          </b-input>
-        </b-field>
+        <client-only>
+          <tiptap v-model="form.content" class="my-5 input wysiwyg-container" />
+        </client-only>
         <b-field>
           <b-switch v-model="form.is_published" type="is-success">
             {{ publishLabel }}
@@ -45,8 +37,13 @@
 </template>
 
 <script>
+import Tiptap from './Tiptap'
+
 export default {
   name: 'ArticleModalForm',
+  components: {
+    Tiptap,
+  },
   props: {
     title: String,
     content: String,
