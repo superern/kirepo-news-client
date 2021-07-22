@@ -33,8 +33,8 @@
         style="flex: 1"
         v-model="query"
         placeholder="Search..."
-        icon="search"
-        size="is-small"
+        icon="magnify"
+        size="is-medium"
         v-debounce:300ms="onSearch"
       />
     </b-field>
