@@ -1,7 +1,36 @@
 <template>
   <section class="m-5">
+    <b-field>
+      <b-button
+        class="add-button"
+        label="Create Article"
+        type="is-primary"
+        size="is-small"
+        @click="isAddModalActive = true"
+      />
+    </b-field>
+    <b-modal
+      v-model="isAddModalActive"
+      has-modal-card
+      full-screen
+      :destroy-on-hide="true"
+      :can-cancel="false"
+      aria-role="dialog"
+      aria-label="Create Article"
+      aria-modal
+    >
+      <template #default="props">
+        <modal-form
+          v-bind="form"
+          @close="props.close"
+          @onSubmit="onAddArticle"
+          action-type="Add"
+        ></modal-form>
+      </template>
+    </b-modal>
     <b-field name="Search">
       <b-input
+        style="flex: 1"
         v-model="query"
         placeholder="Search..."
         icon="magnify"
@@ -117,9 +146,13 @@
 
 <script>
 import { debounce } from 'vue-debounce'
+import ModalForm from '../components/ArticleModalForm'
 
 export default {
   name: 'news',
+  components: {
+    ModalForm,
+  },
   computed: {
     transitionName() {
       if (this.useTransition) {
@@ -148,6 +181,12 @@ export default {
       },
       query: '',
       filter: '',
+      isAddModalActive: false,
+      form: {
+        title: '',
+        content: '',
+        is_published: false,
+      },
     }
   },
   methods: {
@@ -209,6 +248,17 @@ export default {
       }
       vm.loadAsyncData()
     }, 300),
+    onAddArticle(form) {
+      this.$axios.$post('/news', form).then(({ data, message }) => {
+        this.$buefy.toast.open({
+          message: message,
+          type: 'is-success',
+        })
+        this.filter = `${this.sortFilter}`
+        this.loadAsyncData()
+        this.isAddModalActive = false
+      })
+    },
   },
   mounted() {
     this.filter = this.sortFilter
@@ -224,4 +274,9 @@ export default {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.field {
+  display: flex;
+  justify-content: flex-end;
+}
+</style>
