@@ -1,5 +1,5 @@
 <template>
-  <div class="column" v-if="is_published">
+  <div class="column is-one-third" v-if="is_published">
     <div class="card">
       <header class="card-header">
         <p class="card-header-title has-text-grey">

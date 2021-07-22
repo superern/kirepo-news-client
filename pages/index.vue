@@ -1,6 +1,6 @@
 <template>
   <section class="section">
-    <div class="columns is-mobile">
+    <div class="columns is-mobile" style="display: flex; flex-wrap: wrap">
       <card
         :title="article.title"
         :content="article.content"
