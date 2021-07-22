@@ -8,7 +8,7 @@
         :key="article.id"
         :is_published="article.is_published"
       >
-        {{ article.published_at }}
+        {{ $moment(article.published_at).fromNow() }}
       </card>
     </div>
   </section>
