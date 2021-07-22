@@ -26,6 +26,11 @@
           >
           </b-input>
         </b-field>
+        <b-field>
+          <b-switch v-model="form.is_published" type="is-success">
+            {{ publishLabel }}
+          </b-switch>
+        </b-field>
       </section>
       <footer class="modal-card-foot">
         <b-button label="Cancel" @click="$emit('close')" />
@@ -47,6 +52,11 @@ export default {
     content: String,
     is_published: Boolean,
     actionType: String,
+  },
+  computed: {
+    publishLabel() {
+      return this.form.is_published ? 'Publish' : 'Draft'
+    },
   },
   data() {
     return {
