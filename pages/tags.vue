@@ -1,7 +1,36 @@
 <template>
   <section class="m-5">
+    <b-field>
+      <b-button
+        class="add-button"
+        label="Create Tag"
+        type="is-primary"
+        size="is-small"
+        @click="isAddModalActive = true"
+      />
+    </b-field>
+    <b-modal
+      v-model="isAddModalActive"
+      has-modal-card
+      full-screen
+      :destroy-on-hide="true"
+      :can-cancel="false"
+      aria-role="dialog"
+      aria-label="Create Tag"
+      aria-modal
+    >
+      <template #default="props">
+        <modal-form
+          v-bind="form"
+          @close="props.close"
+          @onSubmit="onAddTag"
+          action-type="Add"
+        ></modal-form>
+      </template>
+    </b-modal>
     <b-field name="Search">
       <b-input
+        style="flex: 1"
         v-model="query"
         placeholder="Search..."
         icon="search"
@@ -93,8 +122,13 @@
 </template>
 
 <script>
+import ModalForm from '../components/TagModalForm'
+
 export default {
   name: 'tags',
+  components: {
+    ModalForm,
+  },
   computed: {
     transitionName() {
       if (this.useTransition) {
@@ -115,13 +149,18 @@ export default {
       filterLimit: 20,
       meta: [],
       query: '',
+      isAddModalActive: false,
+      form: {
+        name: '',
+        description: '',
+      },
     }
   },
   methods: {
-    loadAsyncData(url) {
+    loadAsyncData(filter = `sort=${this.sortField},${this.sortOrder}`) {
       this.loading = true
       this.$axios
-        .get(url)
+        .get(`/tags?${filter}`)
         .then(({ data }) => {
           this.meta = data.meta
           let currentTotal = data.meta.total
@@ -140,25 +179,42 @@ export default {
         })
     },
     onPageChange(page) {
-      this.meta.page = page
+      this.meta.current_page = page
       this.loadAsyncData(
-        `/tags?page=${page}&sort=${this.sortField},${this.sortOrder}`
+        `page=${page}&sort=${this.sortField},${this.sortOrder}`
       )
     },
     onSort(field, order) {
-      this.loadAsyncData(`/tags?page=${this.meta.page}&sort=${field},${order}`)
+      this.sortField = field
+      this.sortOrder = order
+      this.loadAsyncData(
+        `page=${this.meta.current_page}&sort=${field},${order}`
+      )
     },
     onSearch(query) {
       this.$buefy.toast.open(`Searching data with key word ${query}`)
-      this.loadAsyncData(
-        `/tags?like[0]=name,${query}&like[1]=description,${query}`
-      )
+      this.loadAsyncData(`like[0]=name,${query}&like[1]=description,${query}`)
+    },
+    onAddTag(form) {
+      this.$axios.$post('/tags', form).then(({ data, message }) => {
+        this.$buefy.toast.open({
+          message: message,
+          type: 'is-success',
+        })
+        this.loadAsyncData()
+        this.isAddModalActive = false
+      })
     },
   },
   mounted() {
-    this.loadAsyncData(`/tags?sort=${this.sortField},${this.sortOrder}`)
+    this.loadAsyncData()
   },
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.field {
+  display: flex;
+  justify-content: flex-end;
+}
+</style>
