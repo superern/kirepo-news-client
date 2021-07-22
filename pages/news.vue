@@ -9,25 +9,6 @@
         @click="isAddModalActive = true"
       />
     </b-field>
-    <b-modal
-      v-model="isAddModalActive"
-      has-modal-card
-      full-screen
-      :destroy-on-hide="true"
-      :can-cancel="false"
-      aria-role="dialog"
-      aria-label="Create Article"
-      aria-modal
-    >
-      <template #default="props">
-        <modal-form
-          v-bind="form"
-          @close="props.close"
-          @onSubmit="onAddArticle"
-          action-type="Add"
-        ></modal-form>
-      </template>
-    </b-modal>
     <b-field name="Search">
       <b-input
         style="flex: 1"
@@ -126,7 +107,7 @@
         <article class="media">
           <figure class="media-left">
             <p class="image is-64x64">
-              <img src="/static/img/placeholder-128x128.png" />
+              <img src="https://via.placeholder.com/150" />
             </p>
           </figure>
           <div class="media-content">
@@ -136,11 +117,62 @@
                 <br />
                 {{ props.row.content }}
               </p>
+
+              <!-- Update Modal Button -->
+              <b-button
+                class="update-button"
+                label="Update"
+                type="is-primary"
+                size="is-small"
+                @click="showUpdateModal(props.row)"
+              />
             </div>
           </div>
         </article>
       </template>
     </b-table>
+
+    <!-- Add Modal -->
+    <b-modal
+      v-model="isAddModalActive"
+      has-modal-card
+      full-screen
+      :destroy-on-hide="true"
+      :can-cancel="false"
+      aria-role="dialog"
+      aria-label="Create Article"
+      aria-modal
+    >
+      <template #default="props">
+        <modal-form
+          v-bind="form"
+          @close="props.close"
+          @onSubmit="onAddArticle"
+          action-type="Add"
+        ></modal-form>
+      </template>
+    </b-modal>
+
+    <!-- Update Modal -->
+    <b-modal
+      v-model="isUpdateModalActive"
+      has-modal-card
+      full-screen
+      :destroy-on-hide="true"
+      :can-cancel="false"
+      aria-role="dialog"
+      aria-label="Update Article"
+      aria-modal
+    >
+      <template #default="props">
+        <modal-form
+          v-bind="form"
+          @close="props.close"
+          @onSubmit="onUpdateArticle"
+          action-type="Update"
+        ></modal-form>
+      </template>
+    </b-modal>
   </section>
 </template>
 
@@ -182,6 +214,7 @@ export default {
       query: '',
       filter: '',
       isAddModalActive: false,
+      isUpdateModalActive: false,
       form: {
         title: '',
         content: '',
@@ -258,6 +291,23 @@ export default {
         this.loadAsyncData()
         this.isAddModalActive = false
       })
+    },
+    showUpdateModal(form) {
+      this.form = form
+      this.isUpdateModalActive = true
+    },
+    onUpdateArticle(form) {
+      this.$axios
+        .$put(`/news/${this.form.id}`, form)
+        .then(({ data, message }) => {
+          this.$buefy.toast.open({
+            message: message,
+            type: 'is-success',
+          })
+          this.filter = `${this.sortFilter}`
+          this.loadAsyncData()
+          this.isUpdateModalActive = false
+        })
     },
   },
   mounted() {

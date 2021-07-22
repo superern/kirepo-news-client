@@ -6,18 +6,23 @@
         <button type="button" class="delete" @click="$emit('close')" />
       </header>
       <section class="modal-card-body">
-        <b-field label="Name">
-          <b-input type="text" v-model="form.title" placeholder="Name" required>
+        <b-field label="Title">
+          <b-input
+            type="text"
+            v-model="form.title"
+            placeholder="Article Title"
+            required
+          >
           </b-input>
         </b-field>
 
-        <b-field label="Description">
+        <b-field label="Content">
           <b-input
             maxlength="200"
             type="textarea"
             v-model="form.content"
             password-reveal
-            placeholder="Your description"
+            placeholder="Your Content"
           >
           </b-input>
         </b-field>
@@ -36,19 +41,19 @@
 
 <script>
 export default {
-  name: 'TagModalForm',
+  name: 'ArticleModalForm',
   props: {
     title: String,
-    description: String,
+    content: String,
     is_published: Boolean,
     actionType: String,
   },
   data() {
     return {
       form: {
-        title: '',
-        description: '',
-        is_published: false,
+        title: this.title,
+        content: this.content,
+        is_published: this.is_published,
       },
     }
   },
