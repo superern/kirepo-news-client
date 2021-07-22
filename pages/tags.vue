@@ -1,5 +1,14 @@
 <template>
   <section class="m-5">
+    <b-field name="Search">
+      <b-input
+        v-model="query"
+        placeholder="Search..."
+        icon="search"
+        size="is-small"
+        v-debounce:300ms="onSearch"
+      />
+    </b-field>
     <b-table
       :data="data"
       ref="table"
@@ -73,7 +82,7 @@
               <p>
                 <strong>{{ props.row.name }} </strong>
                 <br />
-                {{ props.description }}
+                {{ props.row.description }}
               </p>
             </div>
           </div>
@@ -105,6 +114,7 @@ export default {
       defaultSortOrder: 'desc',
       filterLimit: 20,
       meta: [],
+      query: '',
     }
   },
   methods: {
@@ -137,6 +147,12 @@ export default {
     },
     onSort(field, order) {
       this.loadAsyncData(`/tags?page=${this.meta.page}&sort=${field},${order}`)
+    },
+    onSearch(query) {
+      this.$buefy.toast.open(`Searching data with key word ${query}`)
+      this.loadAsyncData(
+        `/tags?like[0]=name,${query}&like[1]=description,${query}`
+      )
     },
   },
   mounted() {
