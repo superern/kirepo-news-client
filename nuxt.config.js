@@ -7,7 +7,7 @@ export default {
 
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    title: 'kirepo-news-client',
+    title: 'Kirepo News',
     htmlAttrs: {
       lang: 'en'
     },
