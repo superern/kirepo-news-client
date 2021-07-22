@@ -4,14 +4,14 @@
       <b-button
         class="trashes-button"
         icon="magnify"
-        :type="isTrashMode ? 'is-danger' : 'is-info'"
+        :type="!isTrashMode ? 'is-danger' : 'is-info'"
         size="is-small"
         @click="toggleTrashMode"
       >
         <span class="icon is-left"
           ><i
             class="mdi mdi-18px"
-            :class="[{ 'mdi-trash-can': isTrashMode }, 'mdi-newspaper']"
+            :class="[{ 'mdi-trash-can': !isTrashMode }, 'mdi-newspaper']"
           ></i
         ></span>
       </b-button>
