@@ -5,10 +5,15 @@
         <p class="card-header-title has-text-grey">
           {{ title }}
         </p>
+        <div class="mx-1 my-2" v-for="tag in tags" :key="tag.id">
+          <b-tag type="is-primary is-primary">
+            {{ tag.name }}
+          </b-tag>
+        </div>
       </header>
       <div class="card-content">
         <div class="content has-text-centered">
-          <p>{{ content }}</p>
+          <div v-html="content"></div>
         </div>
       </div>
       <footer class="card-footer">
@@ -35,6 +40,9 @@ export default {
     },
     is_published: {
       type: Boolean,
+    },
+    tags: {
+      type: Array,
     },
   },
 }

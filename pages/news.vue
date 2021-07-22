@@ -160,6 +160,17 @@
                   @click="onRestoreArticle(props.row.id)"
                 />
               </div>
+              <div style="display: flex; flex-direction: row">
+                <div
+                  class="mx-1 my-4"
+                  v-for="tag in props.row.tags"
+                  :key="tag.id"
+                >
+                  <b-tag type="is-primary is-warning">
+                    {{ tag.name }}
+                  </b-tag>
+                </div>
+              </div>
             </div>
           </div>
         </article>

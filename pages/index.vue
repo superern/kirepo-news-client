@@ -7,6 +7,7 @@
         v-for="article in articles"
         :key="article.id"
         :is_published="article.is_published"
+        :tags="article.tags"
       >
         {{ $moment(article.published_at).fromNow() }}
       </card>
