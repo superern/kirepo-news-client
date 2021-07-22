@@ -146,7 +146,7 @@
       <template #default="props">
         <modal-form
           v-bind="form"
-          @close="props.close"
+          @close="onCancelModal(props)"
           @onSubmit="onAddArticle"
           action-type="Add"
         ></modal-form>
@@ -167,7 +167,7 @@
       <template #default="props">
         <modal-form
           v-bind="form"
-          @close="props.close"
+          @close="onCancelModal(props)"
           @onSubmit="onUpdateArticle"
           action-type="Update"
         ></modal-form>
@@ -282,15 +282,27 @@ export default {
       vm.loadAsyncData()
     }, 300),
     onAddArticle(form) {
-      this.$axios.$post('/news', form).then(({ data, message }) => {
-        this.$buefy.toast.open({
-          message: message,
-          type: 'is-success',
+      this.$axios
+        .$post('/news', form)
+        .then(({ data, message }) => {
+          this.$buefy.toast.open({
+            message: message,
+            type: 'is-success',
+          })
         })
-        this.filter = `${this.sortFilter}`
-        this.loadAsyncData()
-        this.isAddModalActive = false
-      })
+        .catch((err) => {
+          console.log(err.response)
+          this.$buefy.toast.open({
+            message: 'Failed to create your Article',
+            type: 'is-danger',
+          })
+        })
+        .finally(() => {
+          this.form = {}
+          this.filter = `${this.sortFilter}`
+          this.loadAsyncData()
+          this.isAddModalActive = false
+        })
     },
     showUpdateModal(form) {
       this.form = form
@@ -304,10 +316,24 @@ export default {
             message: message,
             type: 'is-success',
           })
+        })
+        .catch((err) => {
+          console.log(err.response)
+          this.$buefy.toast.open({
+            message: 'Failed to update your Article',
+            type: 'is-danger',
+          })
+        })
+        .finally(() => {
+          this.form = {}
           this.filter = `${this.sortFilter}`
           this.loadAsyncData()
           this.isUpdateModalActive = false
         })
+    },
+    onCancelModal(props) {
+      props.close()
+      this.form = {}
     },
   },
   mounted() {
