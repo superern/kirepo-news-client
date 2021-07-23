@@ -99,6 +99,8 @@
         </span>
       </b-table-column>
 
+      <div slot="empty" class="no-records">No records found</div>
+
       <template #detail="props">
         <article class="media">
           <div class="media-content">
