@@ -45,8 +45,8 @@ export default {
   data() {
     return {
       form: {
-        name: '',
-        description: '',
+        name: this.name,
+        description: this.description,
       },
     }
   },

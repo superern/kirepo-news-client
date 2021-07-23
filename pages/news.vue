@@ -54,7 +54,7 @@
       detailed
       detail-key="id"
       :detail-transition="transitionName"
-      @details-open="(row) => $buefy.toast.open(`Expanded ${row.title}`)"
+      @details-open="(row) => $buefy.toast.open(`Showing ${row.title}`)"
       :show-detail-icon="showDetailIcon"
     >
       <!-- ID -->
@@ -456,7 +456,6 @@ export default {
   mounted() {
     this.filter = this.sortFilter
     this.loadAsyncData()
-    const vm = this
   },
   watch: {
     query: {
